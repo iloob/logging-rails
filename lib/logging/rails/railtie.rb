@@ -20,7 +20,11 @@ module Logging::Rails
     end
 
     initializer 'logging.initialize', :before => 'initialize_logger' do
-      ::Rails.logger = ::Logging::Logger[::Rails]
+      if ::Rails.logger.respond_to? :broadcast_to
+        ::Rails.logger.broadcast_to ::Logging::Logger[::Rails]
+      else
+        ::Rails.logger = ::Logging::Logger[::Rails]
+      end
     end
 
     initializer 'logging.active_record.logger', :before => 'active_record.logger' do
